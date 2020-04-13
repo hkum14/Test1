@@ -33,6 +33,16 @@ TEAMS = []
 TYPE = 'maintenance_window'
 
 
+	with open('TZ.txt') as file1:
+	data = json.load(file)
+        SERVICES = []
+        return SERVICES
+    #print(r.json())
+    #data = json.loads(r.text)
+    total_services = data['total']
+    print('Creating maintenance window on {total_services} services...'.format(total_services=total_services))
+    SERVICES = data['services']
+    return SERVICES
 def create_maintenance_window():
     url = 'https://sapient-3.pagerduty.com/api/v1/maintenance_windows'
     headers = {
@@ -51,9 +61,18 @@ def create_maintenance_window():
             'type': TYPE
         }
     }
-    r = requests.post(url, headers=headers, data=json.dumps(payload))
-    print('Status Code: {code}'.format(code=r.status_code))
-    print(r.json())
+  r = requests.post(url, headers=headers, data=json.dumps(payload))
+    print('\tStatus code: {code}'.format(code=str(r.status_code)))
+    if r.status_code >= 200 and r.status_code < 204:
+        print("Maintenance window successfully created:")
+        print("\tStart: ", START_TIME)
+        print("\tEnd: ", END_TIME)
+        print("\tServices: ")
+        for service in range(int(len(SERVICES))):
+            print("\t\t", SERVICES[service]['id'])
+    else:
+        print("\tThere was an error creating this maintenance window.")
+        print("\tPlease ensure that the login email and v2 REST API key in this script have proper permissions")
 
 if __name__ == '__main__':
     create_maintenance_window()
